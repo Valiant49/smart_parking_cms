@@ -1,6 +1,5 @@
 <!-- The routes are registered in public/index.php:-->
 
-
 <?php
 class Router {
     private array $routes = [];
@@ -9,18 +8,25 @@ class Router {
     public function post(string $path, string $handler) { $this->routes['POST'][$path] = $handler; }
 
     public function dispatch(string $method, string $uri) {
-        $path = parse_url($uri, PHP_URL_PATH);
+        $path = rtrim(parse_url($uri, PHP_URL_PATH), '/') ?: '/';
 
         foreach ($this->routes[$method] ?? [] as $route => $handler) {
-            // turn "/vehicles/edit/{id}" into a regex
+            // "/vehicles/edit/{id}" -> regex
             $pattern = '#^' . preg_replace('#\{(\w+)\}#', '([^/]+)', $route) . '$#';
+
             if (preg_match($pattern, $path, $m)) {
-                array_shift($m);                       // remaining items = URL params
+                array_shift($m);                                  // URL params
                 [$class, $action] = explode('@', $handler);
-                require_once __DIR__ . "/../app/controllers/$class.php";
+
+                $file = __DIR__ . "/../app/controllers/$class.php";
+                if (!file_exists($file)) { http_response_code(500); exit("Controller file missing: $class"); }
+                require_once $file;
+
+                $class = basename($class);                        // "Api/X" -> "X"
                 return (new $class)->$action(...$m);
             }
         }
+
         http_response_code(404);
         echo '404 Not Found';
     }

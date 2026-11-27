@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "watch:css": "tailwindcss -i ./src/input.css -o ./css/style.css --watch",
-    "build:css": "tailwindcss -i ./src/input.css -o ./css/style.css --minify"
-  },
+  "watch:css": "tailwindcss -i ./web/public/assets/css/input.css -o ./web/public/assets/css/style.css --watch",
+  "build:css": "tailwindcss -i ./web/public/assets/css/input.css -o ./web/public/assets/css/style.css --minify"
+},
   "dependencies": {
     "@tailwindcss/cli": "^4.3.5",
     "tailwindcss": "^4.3.5"

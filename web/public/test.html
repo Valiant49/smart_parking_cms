@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tailwind test</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-page text-ink font-sans p-8 space-y-6">
+
+  <h1 class="text-2xl font-semibold text-brand-600">Tailwind is working</h1>
+
+  <!-- Plain utilities: if these look right, Tailwind itself is running -->
+  <div class="flex gap-3">
+    <div class="size-12 rounded-lg bg-red-500"></div>
+    <div class="size-12 rounded-lg bg-brand-500"></div>
+    <div class="size-12 rounded-lg bg-sidebar"></div>
+  </div>
+
+  <!-- Your @theme colors and @layer components -->
+  <div class="card max-w-md space-y-3">
+    <p class="font-medium">Card component</p>
+    <input class="input" placeholder="Input component">
+    <div class="flex gap-2">
+      <button class="btn btn-primary">Primary</button>
+      <button class="btn btn-secondary">Secondary</button>
+      <button class="btn btn-danger">Danger</button>
+    </div>
+    <div class="flex gap-2">
+      <span class="badge badge-success">success</span>
+      <span class="badge badge-danger">danger</span>
+      <span class="badge badge-warning">warning</span>
+      <span class="badge badge-neutral">neutral</span>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+web/config/database.php
+arduino/config.h
+node_modules/
+web/public/assets/css/style.css
