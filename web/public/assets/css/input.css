@@ -1,2 +1,59 @@
 @import "tailwindcss";
 
+/* Tell Tailwind where your class names live (path is relative to this file) */
+@source "../../app";
+
+@theme {
+  /* System fonts: no CDN, so it works on an offline demo network */
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  /* Brand scale (swap these to re-skin the whole CMS) */
+  --color-brand-50:  #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-900: #1e3a8a;
+
+  /* Surfaces and text */
+  --color-page:      #f8fafc;
+  --color-surface:   #ffffff;
+  --color-sidebar:   #0f172a;
+  --color-line:      #e2e8f0;
+  --color-ink:       #0f172a;
+  --color-ink-muted: #64748b;
+
+  /* Status colors: one meaning each, used everywhere */
+  --color-success: #15803d;   /* active, available, granted */
+  --color-danger:  #b91c1c;   /* denied, occupied, blocked  */
+  --color-warning: #b45309;   /* maintenance, lost, warning */
+  --color-neutral: #475569;   /* inactive, offline          */
+
+  --radius-card: 0.75rem;
+}
+
+@layer components {
+  .card { @apply bg-surface border border-line rounded-card p-5; }
+
+  /* Buttons: use as class="btn btn-primary" */
+  .btn           { @apply inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors cursor-pointer; }
+  .btn-primary   { @apply bg-brand-600 text-white hover:bg-brand-700; }
+  .btn-secondary { @apply bg-surface text-ink border border-line hover:bg-page; }
+  .btn-danger    { @apply bg-danger text-white hover:opacity-90; }
+
+  /* Form fields */
+  .label { @apply block text-sm font-medium mb-1; }
+  .input { @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20; }
+
+  /* Status badges: use as class="badge badge-success" */
+  .badge         { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
+  .badge-success { @apply bg-success/10 text-success; }
+  .badge-danger  { @apply bg-danger/10 text-danger; }
+  .badge-warning { @apply bg-warning/10 text-warning; }
+  .badge-neutral { @apply bg-neutral/10 text-neutral; }
+
+  /* Tables */
+  .data-table    { @apply w-full text-sm text-left; }
+  .data-table th { @apply px-4 py-3 text-xs font-semibold uppercase tracking-wide text-ink-muted border-b border-line; }
+  .data-table td { @apply px-4 py-3 border-b border-line; }
+}
