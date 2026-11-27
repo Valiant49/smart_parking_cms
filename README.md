@@ -1,1 +1,4 @@
 # SMART PARKING MANAGEMENT SYSTEM WITH RFID
+
+Project Requirements:
+- 
