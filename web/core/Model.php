@@ -1,7 +1,6 @@
-<!-- Base class for all Models -->
-
 <?php
 class Model {
+    // Base class for all Models 
     protected PDO $db;
     protected string $table;          // each child sets this, e.g. 'vehicles'
     protected string $primaryKey = 'id';
