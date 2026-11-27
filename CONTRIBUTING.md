@@ -22,7 +22,7 @@ If the page is unstyled, hard-refresh (Ctrl+Shift+R) and check that the Tailwind
 
 - Pick an issue from the GitHub Project board and move it to **In Progress**.
 - One branch per issue: `feature/<issue#>-short-name` (e.g. `feature/13-vehicle-crud`).
-- Never commit directly to `main`. Pull `main` before you start and before you open a PR.
+- Never commit directly to `main` or `dev`. Pull `dev` before you start and before you open a PR.
 - Commit messages: short and imperative ("Add vehicle search filter").
 - Open a PR that says `Closes #<issue>`. Another teammate must review it before merging.
 - Keep PRs small. Merge often.
