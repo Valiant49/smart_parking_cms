@@ -2,50 +2,122 @@
 require_once __DIR__ . '/../models/Vehicle.php';
 
 class VehicleController extends Controller {
+    public const TYPES    = ['car', 'motorcycle', 'suv', 'van', 'truck', 'other'];
+    public const STATUSES = ['active', 'suspended', 'blocked'];
 
     public function index() {
+        $q = trim($_GET['q'] ?? '');
+        $m = new Vehicle;
+
         $this->view('vehicles/index', [
             'title'    => 'Vehicles',
-            'vehicles' => (new Vehicle)->all(),
+            'vehicles' => $q !== '' ? $m->search($q) : $m->all(),
+            'q'        => $q,
         ]);
     }
 
     public function create() {
-        $this->view('vehicles/create', ['title' => 'Add Vehicle']);
+        $this->view('vehicles/create', [
+            'title'   => 'Add Vehicle',
+            'vehicle' => ['vehicle_type' => 'car', 'status' => 'active'],
+            'errors'  => [],
+        ]);
     }
 
     public function store() {
-        // TODO: validate $_POST and insert via the Vehicle model
+        $m      = new Vehicle;
+        $data   = $this->input();
+        $errors = $this->validate($data, $m);
+
+        if ($errors) {
+            http_response_code(422);
+            return $this->view('vehicles/create', [
+                'title' => 'Add Vehicle', 'vehicle' => $data, 'errors' => $errors,
+            ]);
+        }
+
+        $m->create($data);
         $this->redirect('/vehicles');
     }
 
     public function edit($id) {
-        $vehicle = null;
-        foreach ($this->vehicles() as $v) {
-            if ((int) $v['vehicle_id'] === (int) $id) { $vehicle = $v; break; }
-        }
-        if (!$vehicle) { http_response_code(404); exit('Vehicle not found'); }
+        $vehicle = (new Vehicle)->find($id);
+        if (!$vehicle) $this->notFound();
 
-        $this->view('vehicles/edit', ['title' => 'Edit Vehicle', 'vehicle' => $vehicle]);
+        $this->view('vehicles/edit', [
+            'title' => 'Edit Vehicle', 'vehicle' => $vehicle, 'errors' => [],
+        ]);
     }
 
     public function update($id) {
-        // TODO: validate $_POST and update via the Vehicle model
+        $m = new Vehicle;
+        if (!$m->find($id)) $this->notFound();
+
+        $data   = $this->input();
+        $errors = $this->validate($data, $m, $id);
+
+        if ($errors) {
+            http_response_code(422);
+            $data['vehicle_id'] = $id;
+            return $this->view('vehicles/edit', [
+                'title' => 'Edit Vehicle', 'vehicle' => $data, 'errors' => $errors,
+            ]);
+        }
+
+        $m->update($id, $data);
         $this->redirect('/vehicles');
     }
 
+    // Archives (never hard-deletes). Called by the modal's POST form.
     public function delete($id) {
-        // TODO: set status = 'blocked' (or archive). Never hard-delete.
+        $m = new Vehicle;
+        if (!$m->find($id)) $this->notFound();
+
+        $m->archive($id);
         $this->redirect('/vehicles');
     }
 
-    // TEMPORARY sample data. Replace with: return (new Vehicle)->all();
-    private function vehicles(): array {
-        return [
-            ['vehicle_id' => 1, 'plate_number' => 'ABC 1234', 'owner_name' => 'Juan Dela Cruz', 'vehicle_type' => 'car',        'status' => 'active'],
-            ['vehicle_id' => 2, 'plate_number' => 'XYZ 5678', 'owner_name' => 'Maria Santos',   'vehicle_type' => 'suv',        'status' => 'active'],
-            ['vehicle_id' => 3, 'plate_number' => 'MNO 9012', 'owner_name' => 'Pedro Reyes',    'vehicle_type' => 'motorcycle', 'status' => 'suspended'],
-            ['vehicle_id' => 4, 'plate_number' => 'DEF 3456', 'owner_name' => 'Ana Lim',        'vehicle_type' => 'van',        'status' => 'blocked'],
-        ];
+    // ---------- helpers ----------
+
+    private function input(): array {
+        $fields = ['plate_number', 'vehicle_type', 'brand', 'model',
+                   'color', 'owner_name', 'owner_contact', 'status'];
+        $d = [];
+        foreach ($fields as $f) {
+            $v = trim((string) ($_POST[$f] ?? ''));
+            $d[$f] = $v === '' ? null : $v;           // empty -> NULL
+        }
+        if ($d['plate_number'] !== null) $d['plate_number'] = strtoupper($d['plate_number']);
+        $d['vehicle_type'] ??= 'car';
+        $d['status']       ??= 'active';
+        return $d;
+    }
+
+    private function validate(array $d, Vehicle $m, $exceptId = null): array {
+        $e = [];
+
+        if (empty($d['plate_number'])) {
+            $e['plate_number'] = 'Plate number is required.';
+        } elseif (strlen($d['plate_number']) > 20) {
+            $e['plate_number'] = 'Plate number is too long (max 20).';
+        } elseif (!$m->isUnique('plate_number', $d['plate_number'], $exceptId)) {
+            $e['plate_number'] = 'This plate number is already registered (it may be archived).';
+        }
+
+        if (empty($d['owner_name'])) {
+            $e['owner_name'] = 'Owner name is required.';
+        }
+        if (!in_array($d['vehicle_type'], self::TYPES, true)) {
+            $e['vehicle_type'] = 'Invalid vehicle type.';
+        }
+        if (!in_array($d['status'], self::STATUSES, true)) {
+            $e['status'] = 'Invalid status.';
+        }
+        return $e;
+    }
+
+    private function notFound() {
+        http_response_code(404);
+        exit('Vehicle not found');
     }
 }
